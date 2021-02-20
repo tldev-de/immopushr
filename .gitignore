@@ -1,0 +1,6 @@
+.idea
+*.cookie
+vendor
+.env
+.php_cs.cachecghooks.lock
+

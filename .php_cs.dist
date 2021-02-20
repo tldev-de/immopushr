@@ -1,0 +1,50 @@
+<?php
+
+use PhpCsFixer\Config;
+use Symfony\Component\Finder\Finder;
+
+$finder = Finder::create()
+    ->exclude('vendor')
+    ->exclude('logs')
+    ->in(__DIR__)
+    ->name('*.php')
+    ->ignoreDotFiles(true)
+    ->ignoreVCS(true);
+
+return Config::create()
+    ->setRules([
+        '@PSR2' => true,
+        'align_multiline_comment' => ['comment_type' => 'phpdocs_only'],
+        'binary_operator_spaces' => true,
+        'blank_line_after_opening_tag' => true,
+        'cast_spaces' => true,
+        'class_attributes_separation' => true,
+        'compact_nullable_typehint' => true,
+        'concat_space' => ['spacing' => 'one'],
+        'declare_equal_normalize' => ['space' => 'single'],
+        'function_typehint_space' => true,
+        'no_blank_lines_after_class_opening' => true,
+        'no_blank_lines_after_phpdoc' => true,
+        'no_extra_consecutive_blank_lines' => true,
+        'no_mixed_echo_print' => true,
+        'no_unused_imports' => true,
+        'no_useless_else' => true,
+        'no_useless_return' => true,
+        'no_whitespace_before_comma_in_array' => true,
+        'no_whitespace_in_blank_line' => true,
+        'object_operator_without_whitespace' => true,
+        'ordered_class_elements' => true,
+        'ordered_imports' => true,
+        'phpdoc_align' => true,
+        'phpdoc_indent' => true,
+        'protected_to_private' => true,
+        'return_type_declaration' => true,
+        'single_blank_line_before_namespace' => true,
+        'single_quote' => true,
+        'ternary_operator_spaces' => true,
+        'ternary_to_null_coalescing' => true,
+        'whitespace_after_comma_in_array' => true,
+        'array_syntax' => ['syntax' => 'short'],
+        'array_indentation' => true,
+    ])
+    ->setFinder($finder);

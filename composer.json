@@ -1,0 +1,37 @@
+{
+  "require": {
+    "php-webdriver/webdriver": "^1.9",
+    "illuminate/database": "^8.28",
+    "monolog/monolog": "^2.2",
+    "2captcha/2captcha": "^1.0",
+    "phpoption/phpoption": "^1.7",
+    "vlucas/phpdotenv": "^5.3",
+    "friendsofphp/php-cs-fixer": "^2.18"
+  },
+  "autoload": {
+    "psr-4": {
+      "Models\\": "./models/",
+      "Provider\\": "provider/",
+      "Utils\\": "utils/"
+    }
+  },
+  "extra": {
+    "hooks": {
+      "pre-commit": [
+        "echo committing as $(git config user.name)",
+        "vendor/bin/php-cs-fixer fix --using-cache=no"
+      ],
+      "pre-push": [
+        "vendor/bin/php-cs-fixer fix --using-cache=no --diff --dry-run"
+      ],
+      "post-merge": "composer install"
+    }
+  },
+  "scripts": {
+    "post-install-cmd": "vendor/bin/cghooks add --ignore-lock",
+    "post-update-cmd": "vendor/bin/cghooks update"
+  },
+  "require-dev": {
+    "brainmaestro/composer-git-hooks": "^2.8"
+  }
+}

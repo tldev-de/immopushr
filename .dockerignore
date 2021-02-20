@@ -1,0 +1,12 @@
+.git
+.gitlab
+.vscode
+.idea
+.dockerignore
+.env.example
+.env
+.gitlab-ci.yml
+docker-compose.yml
+README.md
+*.cookie
+vendor
