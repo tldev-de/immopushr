@@ -14,9 +14,9 @@
 
 <div align="center">
   <h3>
-    <a href="#-features">Features</a>
+    <a href="#features">Features</a>
     <span> | </span>
-    <a href="#-how-to-use">How to use</a>
+    <a href="#how-to-use">How to use</a>
     <span> | </span>
     <a href="https://github.com/tldev-de/immopushr/issues">Issues</a>
     <span> | </span>
@@ -25,12 +25,12 @@
 </div>
 
 ## Table of Contents
-* [Features](#-features)
-* [How to use](#-how-to-use)
-* [Configuration Options](#-configuration-options)
-* [Props](#-props)
-* [Contributing](#-contributing)
-* [License](#-license)
+* [Features](#features)
+* [How to use](#how-to-use)
+* [Configuration Options](#configuration-options)
+* [Props](#props)
+* [Contributing](#contributing)
+* [License](#license)
 
 ## Features
 ImmoPushr is a [web scraper](https://en.wikipedia.org/wiki/Web_scraping) for immobilienscout24.de, immowelt.de and ebay-kleinanzeigen.de.
