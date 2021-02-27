@@ -27,3 +27,7 @@ services:
       - CRON_PATTERN=50 7-22 * * *
       - SELENIUM_URL=http://selenium:4444
       - URLS=https://www.immobilienscout24.de/Suche/radius/wohnung-mieten?centerofsearchaddress=Berlin;;;;;&numberofrooms=1.5-&price=-1000.0&pricetype=rentpermonth&geocoordinates=52.51051;13.43068;4.0&sorting=2
+
+volumes:
+  immopushr_db:
+  immopushr_logs:
