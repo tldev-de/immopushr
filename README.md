@@ -28,6 +28,7 @@
 * [Features](#features)
 * [How to use](#how-to-use)
 * [Configuration Options](#configuration-options)
+* [Development](#development)
 * [Props](#props)
 * [Contributing](#contributing)
 * [License](#license)
@@ -127,6 +128,14 @@ Simply add you search URLs seperated by `|`.
 A search URL may look like this: `https://www.immobilienscout24.de/Suche/radius/wohnung-mieten?centerofsearchaddress=Berlin;;;;;&numberofrooms=1.5-&price=-1000.0&pricetype=rentpermonth&geocoordinates=52.51051;13.43068;4.0&sorting=2`.
 Since only the first page will be crawled, you should order the results by creation date.
 
+## Development
+You can run the script locally with php-cli: `php cron.php`.
+Before starting the script, you need to provide the environment variables in a `.env` file.
+You can start a local selenium instance using the following command:
+```
+docker run -d --name selenium -e SCREEN_WIDTH=1920 -e SCREEN_HEIGHT=1080 -p 127.0.0.1:4444:4444 -p 127.0.0.1:5900:5900 -v /dev/shm:/dev/shm selenium/standalone-chrome:4
+```
+
 ## Props
 Props to [Flathunter](https://github.com/flathunters/flathunter), which I actually wanted to use.
 Since their crawler was not working for me, I decided to build my own alternative using selenium.
@@ -136,7 +145,7 @@ Nevertheless, it's a great project, and if you are a python developer you should
 I'm really happy to accept contributions from the community, that’s the main reason why I open-sourced it!
 There are many ways to contribute, even if you’re not a technical person.
 You can report issues directly on Github.
-Please document as much as possible the steps to reproduce your problem (even better with logs and cour configuration).
+Please document as much as possible the steps to reproduce your problem (even better with logs and your configuration).
 
 ## License
 GPL-v3 @ [Tobias Dillig](https://tobias-dillig.de)
