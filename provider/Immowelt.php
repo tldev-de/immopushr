@@ -30,18 +30,21 @@ class Immowelt extends Provider
         $this->browser->executeScript('window.scrollTo(0,document.body.scrollHeight);');
         Utils::sleepRandomSeconds(1, 2);
         $this->saveCookies();
-        $elements = $this->browser->findElements(WebDriverBy::cssSelector('.listcontent'));
+        $elements = $this->browser->findElements(WebDriverBy::cssSelector('.listitem'));
         Log::info('found ' . count($elements) . ' offers!', ['title' => $this->browser->getTitle()]);
         $offers = [];
-        foreach ($elements as $key => $element) {
+        foreach ($elements as $element) {
             $foreignId = $element->findElement(WebDriverBy::cssSelector('.btn_remember'))->getAttribute('data-estateid');
-            $title = trim($element->findElement(WebDriverBy::cssSelector('h2'))->getAttribute('textContent'));
-            $link = $element->findElement(WebDriverBy::cssSelector('a'))->getAttribute('href');
-            $price = trim($element->findElement(WebDriverBy::cssSelector('.price_sale > strong'))->getAttribute('textContent'));
-            $flatSize = trim(str_replace('Wohnfläche (ca.)', '', $element->findElement(WebDriverBy::cssSelector('.square_meters'))->getAttribute('textContent')));
-            $rooms = trim(str_replace('Zimmer', '', $element->findElement(WebDriverBy::cssSelector('.rooms'))->getAttribute('textContent')));
-            $address = trim($element->findElement(WebDriverBy::cssSelector('.listlocation'))->getAttribute('textContent'));
-            $offers[] = new OfferDTO($this->getProviderName(), $foreignId, $title, $link, $price, $flatSize, $rooms, $address);
+            $title = $element->findElement(WebDriverBy::cssSelector('h2'));
+            $this->browser->executeScript('window.scrollTo(0,' . $title->getLocation()->getY() . ');');
+            $title = trim($title->getText());
+            $link = 'https://www.immowelt.de' . $element->findElement(WebDriverBy::cssSelector('a'))->getAttribute('href');
+            $price = trim($element->findElement(WebDriverBy::cssSelector('.price_sale > strong'))->getText());
+            $flatSize = trim(str_replace('Wohnfläche (ca.)', '', $element->findElement(WebDriverBy::cssSelector('.square_meters'))->getText()));
+            $rooms = trim(str_replace('Zimmer', '', $element->findElement(WebDriverBy::cssSelector('.rooms'))->getText()));
+            $address = trim($element->findElement(WebDriverBy::cssSelector('.listlocation'))->getText());
+            $dto = new OfferDTO($this->getProviderName(), $foreignId, $title, $link, $price, $flatSize, $rooms, $address);
+            $offers[] = $dto;
         }
         return $offers;
     }
