@@ -4,6 +4,7 @@ namespace Provider;
 
 use Facebook\WebDriver\WebDriverBy;
 use Models\OfferDTO;
+use TwoCaptcha\Exception\ApiException;
 use TwoCaptcha\TwoCaptcha;
 use Utils\Log;
 use Utils\Utils;
@@ -24,7 +25,7 @@ class Immobilienscout24 extends Provider
     {
         $this->restoreCookies();
         $this->browser->get($url);
-        Utils::sleepRandomSeconds(2, 20);
+        Utils::sleepRandomSeconds(5, 20);
         if ($this->hasCaptcha()) {
             Log::info('identified captcha page!');
             $status = $this->solveCaptcha();
@@ -40,13 +41,25 @@ class Immobilienscout24 extends Provider
         foreach ($elements as $element) {
             $foreignId = $element->getAttribute('data-id');
             $title = trim(str_replace('NEU', '', $element->findElement(WebDriverBy::cssSelector('h5'))->getText()));
-            $link = $element->findElement(WebDriverBy::cssSelector('a'))->getAttribute('href');
-            $fields = $element->findElements(WebDriverBy::cssSelector('.result-list-entry__primary-criterion > dd'));
-            $price = trim($fields[0]->getText());
-            $flatSize = trim($fields[1]->getText());
-            $rooms = trim($fields[2]->getText());
+            $link = 'https://www.immobilienscout24.de' . $element->findElement(WebDriverBy::cssSelector('a'))->getAttribute('href');
+            $fields = $element->findElements(WebDriverBy::cssSelector('dl.result-list-entry__primary-criterion'));
+            $price = 'n/a';
+            $flatSize = 'n/a';
+            $rooms = 'n/a';
+            foreach ($fields as $field) {
+                if (str_contains($field->getText(), 'Kaufpreis')) {
+                    $price = trim($field->findElement(WebDriverBy::tagName('dd'))->getText());
+                }
+                if (str_contains($field->getText(), 'Wohnfl')) {
+                    $flatSize = trim($field->findElement(WebDriverBy::tagName('dd'))->getText());
+                }
+                if (str_contains($field->getText(), 'Zi.')) {
+                    $rooms = trim($field->findElement(WebDriverBy::tagName('dd'))->getText());
+                }
+            }
             $address = trim($element->findElement(WebDriverBy::cssSelector('.result-list-entry__map-link'))->getText());
-            $offers[] = new OfferDTO($this->getProviderName(), $foreignId, $title, $link, $price, $flatSize, $rooms, $address);
+            $dto = new OfferDTO($this->getProviderName(), $foreignId, $title, $link, $price, $flatSize, $rooms, $address);
+            $offers[] = $dto;
         }
         return $offers;
     }
@@ -65,15 +78,36 @@ class Immobilienscout24 extends Provider
         }
         $solver = new TwoCaptcha(env('CAPTCHA_TOKEN'));
 
-        Log::info('solve captcha using 2captcha');
-        $result = $solver->recaptcha([
-            'sitekey' => $this->browser->findElement(WebDriverBy::cssSelector('.g-recaptcha'))->getAttribute('data-sitekey'),
-            'url' => $this->browser->getCurrentURL(),
-        ]);
-        Log::info('solved captcha!');
+        Log::info('click captcha button');
+        $this->browser->executeScript('document.querySelector(".geetest_btn").click()');
+        Utils::sleepRandomSeconds(2, 6);
 
-        $this->browser->executeScript('document.getElementById("g-recaptcha-response").innerHTML="' . $result->code . '";');
-        $this->browser->executeScript('solvedCaptcha("' . $result->code . '")');
+        if (!$this->hasCaptcha()) {
+            return true;
+        }
+
+        Log::info('solve captcha using 2captcha');
+        $challenge = $this->browser->executeScript('return GeeChallenge;');
+        $gt = $this->browser->executeScript('return GeeGT;');
+
+        if (!$challenge || !$gt) {
+            Log::error('unable to get geetest captcha');
+            return false;
+        }
+        return false; // TODO: we can skip here since the challenge is already used at this step and cannot be reused
+        try {
+            $result = $solver->geetest([
+                'gt' => $gt,
+                'challenge' => $challenge,
+                'url' => $this->browser->getCurrentURL(),
+            ]);
+            Log::info('solved captcha!');
+        } catch (ApiException $e) {
+            Log::error('Unable to solve captcha, skip immobilienscout24 for this time');
+            return false;
+        }
+
+        $this->browser->executeScript('solvedCaptcha({geetest_challenge: "' . $result->challenge . '", geetest_validate: "' . $result->validate . '", geetest_seccode: "' . $result->seccode . '",});');
 
         Utils::sleepRandomSeconds(2, 5);
         return !$this->hasCaptcha();
